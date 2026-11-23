@@ -3,6 +3,10 @@ import path from "path";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { Pool } from "pg";
+
+const connectionString = process.env.DATABASE_URL;
+const pool = connectionString ? new Pool({ connectionString }) : null;
 
 export interface UserPayload {
   userId: string;
@@ -94,32 +98,40 @@ export async function clearSessionCookie(): Promise<void> {
 }
 
 /**
- * Authenticates user against data/users.json using bcryptjs.
+ * Authenticates user.
  */
 export async function authenticateUser(
   email: string,
   pass: string
 ): Promise<UserPayload | null> {
+  if (pool) {
+    try {
+      const res = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+      if (res.rows.length === 0) return null;
+      const user = res.rows[0];
+      const isValid = await bcrypt.compare(pass, user.password_hash);
+      if (!isValid) return null;
+      return {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    } catch (e) {
+      console.error("PG Auth error:", e);
+    }
+  }
+
+  // Fallback
   try {
     const filePath = path.join(process.cwd(), "data", "users.json");
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
+    if (!fs.existsSync(filePath)) return null;
     const fileData = fs.readFileSync(filePath, "utf8");
     const users: UserRecord[] = JSON.parse(fileData);
-
-    const user = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-    if (!user || !user.password) {
-      return null;
-    }
-
+    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (!user || !user.password) return null;
     const isValid = await bcrypt.compare(pass, user.password);
-    if (!isValid) {
-      return null;
-    }
-
+    if (!isValid) return null;
     return {
       userId: user.userId,
       email: user.email,
@@ -130,4 +142,38 @@ export async function authenticateUser(
     console.error("authenticateUser error:", error);
     return null;
   }
+}
+
+export async function registerUser(name: string, email: string, pass: string): Promise<UserPayload> {
+    const passwordHash = await bcrypt.hash(pass, 10);
+    const id = `user-${Date.now()}`;
+    
+    if (pool) {
+        await pool.query(
+            "INSERT INTO users (id, name, email, password_hash, role) VALUES ($1, $2, $3, $4, $5)",
+            [id, name, email, passwordHash, 'user']
+        );
+    } else {
+        const filePath = path.join(process.cwd(), "data", "users.json");
+        let users: UserRecord[] = [];
+        if (fs.existsSync(filePath)) {
+            users = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        }
+        users.push({ userId: id, name, email, password: passwordHash, role: 'user' });
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
+        fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+    }
+    return { userId: id, name, email, role: 'user' };
+}
+
+export async function checkEmailExists(email: string): Promise<boolean> {
+    if (pool) {
+        const res = await pool.query("SELECT 1 FROM users WHERE email = $1", [email]);
+        return res.rows.length > 0;
+    } else {
+        const filePath = path.join(process.cwd(), "data", "users.json");
+        if (!fs.existsSync(filePath)) return false;
+        const users: UserRecord[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        return users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    }
 }

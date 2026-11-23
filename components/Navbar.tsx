@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/app/actions/auth";
+import { MobileNav } from "./MobileNav";
 
 export async function Navbar() {
   const session = await getSession();
@@ -20,8 +21,8 @@ export async function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation Links & User Info */}
-        <nav className="flex items-center gap-3 sm:gap-6">
+        {/* Desktop Navigation Links & User Info */}
+        <nav className="hidden md:flex items-center gap-3 sm:gap-6">
           <Link
             href="/"
             className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
@@ -44,7 +45,7 @@ export async function Navbar() {
                 Inventory
               </Link>
 
-              <div className="hidden md:flex items-center gap-2.5 pl-3 border-l border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5 pl-3 border-l border-zinc-200 dark:border-zinc-800">
                 <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                   {session.name}
                 </span>
@@ -77,6 +78,9 @@ export async function Navbar() {
             </Link>
           )}
         </nav>
+
+        {/* Mobile Hamburger Navigation */}
+        <MobileNav session={session} />
       </div>
     </header>
   );

@@ -1,25 +1,17 @@
 # System Capabilities
 
-## 1. Authentication & Session Management (`lib/auth.ts`, `middleware.ts`)
-* **JWT Token Security**: Generates and verifies JSON Web Tokens (JWT) using the `jose` library with HS256 signature algorithm and 7-day expiration.
-* **HTTP-Only Cookie Sessions**: Manages session state via `httpOnly`, `sameSite: "lax"`, and production-secured cookies named `session`.
-* **Password Hashing & Authentication**: Validates user credentials against `data/users.json` using `bcryptjs` password comparison (`bcrypt.compare`).
-* **Role Support**: Supports user roles (`admin` and `user`).
-* **Route Protection**: Next.js edge middleware checks session validity and protects `/dashboard` and `/inventory` routes, automatically redirecting unauthenticated requests to `/login?from=<path>`.
-* **Smart Redirection**: Redirects authenticated users attempting to access `/login` back to `/dashboard`.
+## 1. Authentication & Session Management
+* **JWT Token Security**: Generates and verifies JSON Web Tokens (JWT) using `jose` with 7-day expiration.
+* **Password Security**: Uses `bcryptjs` for robust password hashing and verification.
+* **Full Authentication Flow**: Supports `/register` and `/login` endpoints with session-based JWT persistence. Includes demo account fallback for immediate testing.
+* **Role-Based Access Control (RBAC)**: Enforces access to sensitive features for `admin` vs `user` roles.
 
-## 2. Inventory Data Management (`lib/inventory.ts`)
-* **Data Operations**: Supports retrieval of all items (`getAllItems`), single item lookup (`getItemById`), creation (`addItem`), deletion (`deleteItem`), and updates (`updateItem`).
-* **Environment-Aware Storage**: Dynamically switches storage paths between `data/inventory.json` (development) and `/tmp/inventory.json` (production).
-* **Automatic Initialization**: Gracefully creates directories and fallback empty dataset if the JSON storage file is absent or corrupted.
-* **Data Validation**: Validates quantity and price during updates to ensure non-negative values.
+## 2. PostgreSQL Persistent Inventory (`db/schema.sql`)
+* **Relational Database**: Fully backed by PostgreSQL, ensuring ACID compliance for critical inventory data.
+* **CRUD Operations**: Complete support for creating, reading, updating, and deleting inventory items.
+* **Data Initialization**: `db/seed.js` script allows for automated population of 20 realistic items, including scenarios for low-stock monitoring (< 10 units).
+* **Supabase Compatible**: Designed for easy integration with PostgreSQL-based managed services like Supabase.
 
-## 3. Dashboard Overview (`app/dashboard/page.tsx`)
-* **User Context**: Displays the authenticated user's name and role badge (`admin` / `user`).
-* **Inventory Metrics**: Calculates and renders key performance metrics:
-  * **Total Items**: Total count of unique SKUs.
-  * **Total Stock**: Sum of all physical units in inventory.
-  * **Total Value**: Total inventory financial valuation (`quantity * price`).
-  * **Low Stock Alerts**: Count of items with stock quantity below threshold (< 10 units), highlighted visually in rose/red.
-* **Recent Activity**: Displays a table of the 5 most recently added items ordered by creation date.
-* **Navigation**: Provides direct navigation links to inventory management and detailed item views.
+## 3. Dashboard Overview
+* **Interactive UI**: Responsive dashboard for mobile, tablet, and desktop with clear navigation (Back buttons) and status tracking.
+* **Inventory Analytics**: Real-time aggregate metrics including total units, valuation, and low-stock indicators.

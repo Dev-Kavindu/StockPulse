@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { loginAction } from "@/app/actions/auth";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
@@ -92,6 +93,11 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+
+        <div className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+          Don't have an account?{" "}
+          <Link href="/register" className="text-indigo-600 hover:underline">Sign Up</Link>
+        </div>
 
         {/* Demo */}
         <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
