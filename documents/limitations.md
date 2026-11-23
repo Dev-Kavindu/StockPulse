@@ -8,11 +8,11 @@
 
 ## 2. Authentication & Security Limitations
 * **Synchronous File I/O**: `lib/auth.ts` uses synchronous file system calls (`fs.readFileSync`, `fs.existsSync`) to read user data during authentication.
-* **Mismatched Secret Key Handling**: `middleware.ts` contains a fallback default `JWT_SECRET` string if the environment variable is omitted, whereas `lib/auth.ts` throws an explicit error when `JWT_SECRET` is missing.
+* **Mismatched Secret Key Handling**: `middleware.ts` throws an error if `JWT_SECRET` is missing.
 * **Lack of Role-Based Route Protection**: Middleware checks authentication state but does not enforce granular role-based permissions (e.g., restricting delete/create actions to `admin` users).
 * **Missing User Management**: No API or UI endpoints for user registration, password changes, or profile management.
 
 ## 3. Inventory & Dashboard Limitations
-* **No Item Editing**: `lib/inventory.ts` lacks functions to update or edit existing inventory items.
+* **Limited Item Editing**: Although `updateItem` is implemented, there is no specialized validation schema (e.g., Zod) for complex constraints beyond basic non-negative checks.
 * **Dashboard Metric Constraints**: The dashboard recent items table is fixed to 5 items without pagination, filtering, or inline management options.
 * **Strict Schema Assumptions**: Numeric calculations for quantity and price rely on client/server parsing without dedicated data validation schemas (e.g., Zod).

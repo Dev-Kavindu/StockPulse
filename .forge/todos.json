@@ -1,56 +1,47 @@
 [
   {
     "id": "1",
-    "content": "Polished InventoryClient.tsx with modern styling, transitions, and loading states.",
-    "status": "completed",
+    "content": "Implement updateItem in lib/inventory.ts",
+    "status": "in_progress",
     "dependencies": [],
     "assignee": null,
     "created_at": "2026-11-22T17:28:55.760485+00:00",
-    "updated_at": "2026-11-23T05:40:18.679557+00:00"
+    "updated_at": "2026-11-23T06:44:50.374822+00:00"
   },
   {
     "id": "2",
-    "content": "Polish app/login/page.tsx for clean modern Tailwind styling and transitions.",
+    "content": "Align JWT_SECRET handling between lib/auth.ts and middleware.ts",
     "status": "pending",
     "dependencies": [],
     "assignee": null,
     "created_at": "2026-11-22T17:28:55.760569+00:00",
-    "updated_at": "2026-11-23T05:40:18.679557+00:00"
+    "updated_at": "2026-11-23T06:44:50.374822+00:00"
   },
   {
     "id": "3",
-    "content": "Polish app/dashboard/page.tsx for clean modern Tailwind styling, transitions, and clear low-stock (< 10) hierarchy.",
+    "content": "Add server actions & UI edit capability on /inventory and /inventory/[id] with validation",
     "status": "pending",
     "dependencies": [],
     "assignee": null,
     "created_at": "2026-11-22T17:28:55.760588+00:00",
-    "updated_at": "2026-11-23T05:40:18.679557+00:00"
+    "updated_at": "2026-11-23T06:44:50.374822+00:00"
   },
   {
     "id": "4",
-    "content": "Polish app/inventory/page.tsx for consistency with dashboard.",
+    "content": "Update documents/capabilities.md and documents/limitations.md",
     "status": "pending",
     "dependencies": [],
     "assignee": null,
     "created_at": "2026-11-23T05:40:18.679494+00:00",
-    "updated_at": "2026-11-23T05:40:18.679496+00:00"
+    "updated_at": "2026-11-23T06:44:50.374822+00:00"
   },
   {
     "id": "5",
-    "content": "Polish app/inventory/[id]/page.tsx for consistency.",
+    "content": "Run typecheck and build validation",
     "status": "pending",
     "dependencies": [],
     "assignee": null,
     "created_at": "2026-11-23T05:40:18.679500+00:00",
-    "updated_at": "2026-11-23T05:40:18.679502+00:00"
-  },
-  {
-    "id": "6",
-    "content": "Polish app/inventory/[id]/ItemDetailClient.tsx for clean modern Tailwind styling and transitions.",
-    "status": "pending",
-    "dependencies": [],
-    "assignee": null,
-    "created_at": "2026-11-23T05:40:18.679505+00:00",
-    "updated_at": "2026-11-23T05:40:18.679506+00:00"
+    "updated_at": "2026-11-23T06:44:50.374822+00:00"
   }
 ]

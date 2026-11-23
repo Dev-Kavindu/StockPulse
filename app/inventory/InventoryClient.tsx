@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from "react";
-import { addItemAction, ActionState } from "./actions";
+import { addItemAction, updateItemAction, ActionState } from "./actions";
 import Link from "next/link";
 
 interface InventoryClientProps {
@@ -20,7 +20,7 @@ interface InventoryClientProps {
 }
 
 export default function InventoryClient({ items, userRole, onDelete }: InventoryClientProps) {
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+  const [addState, addFormAction, isAdding] = useActionState<ActionState, FormData>(
     addItemAction,
     null
   );
@@ -29,6 +29,7 @@ export default function InventoryClient({ items, userRole, onDelete }: Inventory
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const categories = Array.from(new Set(items.map((i) => i.category)));
 
@@ -91,7 +92,7 @@ export default function InventoryClient({ items, userRole, onDelete }: Inventory
         </div>
       )}
 
-      {/* Items Table / Cards */}
+      {/* Items Table */}
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -115,64 +116,20 @@ export default function InventoryClient({ items, userRole, onDelete }: Inventory
                   <th className="py-3 px-6">Category</th>
                   <th className="py-3 px-6">Quantity</th>
                   <th className="py-3 px-6">Price</th>
-                  <th className="py-3 px-6">Added By</th>
-                  <th className="py-3 px-6 text-right">Actions</th>
+                  <th className="py-3 px-6">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
                 {filteredItems.map((item) => (
-                  <tr
+                  <InventoryRow
                     key={item.id}
-                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <td className="py-4 px-6 font-medium text-zinc-900 dark:text-zinc-100">
-                      <Link
-                        href={`/inventory/${item.id}`}
-                        className="hover:text-blue-600 dark:hover:text-blue-400 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
-                      >
-                        {item.name}
-                      </Link>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
-                        {item.category}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span
-                        className={`font-semibold ${
-                          item.quantity <= 5
-                            ? "text-amber-600 dark:text-amber-400"
-                            : "text-zinc-700 dark:text-zinc-300"
-                        }`}
-                      >
-                        {item.quantity}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 font-mono text-zinc-900 dark:text-zinc-100">
-                      ${item.price.toFixed(2)}
-                    </td>
-                    <td className="py-4 px-6 text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[150px]">
-                      {item.createdBy}
-                    </td>
-                    <td className="py-4 px-6 text-right space-x-3">
-                      <Link
-                        href={`/inventory/${item.id}`}
-                        className="text-blue-600 dark:text-blue-400 hover:underline text-xs font-medium"
-                      >
-                        View
-                      </Link>
-                      {userRole === "admin" && (
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          disabled={deletingId === item.id}
-                          className="text-red-600 dark:text-red-400 hover:underline text-xs font-medium disabled:opacity-50"
-                        >
-                          {deletingId === item.id ? "Deleting..." : "Delete"}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
+                    item={item}
+                    userRole={userRole}
+                    onDelete={handleDelete}
+                    deletingId={deletingId}
+                    isEditing={editingId === item.id}
+                    setEditingId={setEditingId}
+                  />
                 ))}
               </tbody>
             </table>
@@ -186,132 +143,76 @@ export default function InventoryClient({ items, userRole, onDelete }: Inventory
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             Add New Item
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Fill in the details below to add a new item to the inventory.
-          </p>
         </div>
 
-        {state?.message && (
+        {addState?.message && (
           <div
             className={`p-4 rounded-lg text-sm border ${
-              state.success
+              addState.success
                 ? "bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-900 text-green-700 dark:text-green-300"
                 : "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900 text-red-700 dark:text-red-300"
             }`}
           >
-            {state.message}
+            {addState.message}
           </div>
         )}
 
-        <form action={formAction} className="space-y-4">
+        <form action={addFormAction} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Item Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                required
-                placeholder="e.g. Ergonomic Office Chair"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-              {state?.errors?.name && (
-                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                  {state.errors.name}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Category
-              </label>
-              <input
-                type="text"
-                name="category"
-                required
-                placeholder="e.g. Furniture"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-              {state?.errors?.category && (
-                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                  {state.errors.category}
-                </p>
-              )}
-            </div>
+            <input type="text" name="name" placeholder="Item Name" required className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="text" name="category" placeholder="Category" required className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Quantity
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                required
-                min="0"
-                placeholder="0"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-              {state?.errors?.quantity && (
-                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                  {state.errors.quantity}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Price ($)
-              </label>
-              <input
-                type="number"
-                name="price"
-                required
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-              {state?.errors?.price && (
-                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                  {state.errors.price}
-                </p>
-              )}
-            </div>
+            <input type="number" name="quantity" min="0" placeholder="Quantity" required className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="number" name="price" min="0" step="0.01" placeholder="Price ($)" required className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-
-          <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              required
-              rows={3}
-              placeholder="Provide a brief description of the item..."
-              className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            />
-            {state?.errors?.description && (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                {state.errors.description}
-              </p>
-            )}
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-xl transition-all duration-200 shadow-sm shadow-blue-500/20 disabled:opacity-50 active:scale-95"
-            >
-              {isPending ? "Adding..." : "Add Item"}
-            </button>
-          </div>
+          <textarea name="description" placeholder="Description" required rows={2} className="w-full px-4 py-2.5 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <button type="submit" disabled={isAdding} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-xl disabled:opacity-50">
+            {isAdding ? "Adding..." : "Add Item"}
+          </button>
         </form>
       </div>
     </div>
+  );
+}
+
+function InventoryRow({ item, userRole, onDelete, deletingId, isEditing, setEditingId }: any) {
+  const [updateState, updateFormAction, isUpdating] = useActionState(updateItemAction.bind(null, item.id), null);
+
+  if (isEditing) {
+    return (
+      <tr className="bg-zinc-50 dark:bg-zinc-800/50">
+        <td colSpan={5} className="py-2 px-6">
+          <form action={updateFormAction} className="flex gap-2 items-center text-xs">
+            <input name="name" defaultValue={item.name} className="flex-1 p-1 rounded border border-zinc-300" />
+            <input name="category" defaultValue={item.category} className="w-24 p-1 rounded border border-zinc-300" />
+            <input name="quantity" type="number" defaultValue={item.quantity} className="w-16 p-1 rounded border border-zinc-300" />
+            <input name="price" type="number" step="0.01" defaultValue={item.price} className="w-20 p-1 rounded border border-zinc-300" />
+            <input type="hidden" name="description" defaultValue={item.description} />
+            <button type="submit" disabled={isUpdating} className="px-2 py-1 bg-green-600 text-white rounded">{isUpdating ? "..." : "Save"}</button>
+            <button type="button" onClick={() => setEditingId(null)} className="px-2 py-1 bg-zinc-200 rounded">Cancel</button>
+          </form>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors">
+      <td className="py-4 px-6 font-medium text-zinc-900 dark:text-zinc-100">{item.name}</td>
+      <td className="py-4 px-6"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">{item.category}</span></td>
+      <td className="py-4 px-6">
+        <span className={`font-semibold ${item.quantity < 10 ? "text-amber-600 dark:text-amber-400" : "text-zinc-700 dark:text-zinc-300"}`}>
+          {item.quantity}
+        </span>
+      </td>
+      <td className="py-4 px-6 font-mono text-zinc-900 dark:text-zinc-100">${item.price.toFixed(2)}</td>
+      <td className="py-4 px-6 space-x-3">
+        <button onClick={() => setEditingId(item.id)} className="text-blue-600 dark:text-blue-400 hover:underline text-xs font-medium">Edit</button>
+        {userRole === "admin" && (
+          <button onClick={() => onDelete(item.id)} disabled={deletingId === item.id} className="text-red-600 dark:text-red-400 hover:underline text-xs font-medium">Delete</button>
+        )}
+      </td>
+    </tr>
   );
 }

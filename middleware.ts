@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET_ENV = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-production-1234567890abcdef";
+const JWT_SECRET_ENV = process.env.JWT_SECRET;
+if (!JWT_SECRET_ENV) {
+  throw new Error("JWT_SECRET environment variable is missing.");
+}
 const secretKey = new TextEncoder().encode(JWT_SECRET_ENV);
 
 export async function middleware(request: NextRequest) {

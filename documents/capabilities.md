@@ -9,10 +9,10 @@
 * **Smart Redirection**: Redirects authenticated users attempting to access `/login` back to `/dashboard`.
 
 ## 2. Inventory Data Management (`lib/inventory.ts`)
-* **Data Operations**: Supports retrieval of all items (`getAllItems`), single item lookup (`getItemById`), creation (`addItem`), and deletion (`deleteItem`).
+* **Data Operations**: Supports retrieval of all items (`getAllItems`), single item lookup (`getItemById`), creation (`addItem`), deletion (`deleteItem`), and updates (`updateItem`).
 * **Environment-Aware Storage**: Dynamically switches storage paths between `data/inventory.json` (development) and `/tmp/inventory.json` (production).
 * **Automatic Initialization**: Gracefully creates directories and fallback empty dataset if the JSON storage file is absent or corrupted.
-* **ID & Timestamp Generation**: Automatically generates unique item IDs (`item-<timestamp>-<random>`) and ISO timestamps (`createdAt`) when adding items.
+* **Data Validation**: Validates quantity and price during updates to ensure non-negative values.
 
 ## 3. Dashboard Overview (`app/dashboard/page.tsx`)
 * **User Context**: Displays the authenticated user's name and role badge (`admin` / `user`).
