@@ -1,0 +1,52 @@
+[
+  {
+    "id": "item-2",
+    "name": "Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "quantity": 50,
+    "price": 89.99,
+    "description": "RGB backlit mechanical keyboard with Bluetooth and 2.4G wireless connectivity.",
+    "createdAt": "2025-01-16T09:30:00.000Z",
+    "createdBy": "admin@company.com"
+  },
+  {
+    "id": "item-3",
+    "name": "Ultra-Wide 34-inch Monitor",
+    "category": "Electronics",
+    "quantity": 12,
+    "price": 499,
+    "description": "IPS panel curved ultra-wide monitor with USB-C power delivery.",
+    "createdAt": "2025-01-18T11:00:00.000Z",
+    "createdBy": "admin@company.com"
+  },
+  {
+    "id": "item-4",
+    "name": "Stainless Steel Water Bottle",
+    "category": "Accessories",
+    "quantity": 100,
+    "price": 24.5,
+    "description": "Double-wall vacuum insulated water bottle keeping drinks cold for 24 hours.",
+    "createdAt": "2025-01-20T14:15:00.000Z",
+    "createdBy": "user@company.com"
+  },
+  {
+    "id": "item-5",
+    "name": "Adjustable Laptop Stand",
+    "category": "Accessories",
+    "quantity": 40,
+    "price": 34.99,
+    "description": "Foldable aluminum desktop laptop riser compatible with 10-17 inch laptops.",
+    "createdAt": "2025-01-22T16:45:00.000Z",
+    "createdBy": "user@company.com"
+  },
+  {
+    "name": "Air buds",
+    "category": "Electronics",
+    "description": "This is a premium air buds",
+    "quantity": 30,
+    "price": 11.97,
+    "createdBy": "admin@company.com",
+    "id": "item-1795370598382-xjgi3ur",
+    "createdAt": "2026-11-22T18:03:18.382Z"
+  }
+]

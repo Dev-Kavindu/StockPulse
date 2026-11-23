@@ -1,0 +1,16 @@
+[
+  {
+    "id": "user-1",
+    "email": "admin@company.com",
+    "password": "$2b$10$udOolfnIMrozFnDhj106CeZ6yyAWlNlumQHvQmHAashWlPNqaGRoG",
+    "role": "admin",
+    "name": "System Admin"
+  },
+  {
+    "id": "user-2",
+    "email": "user@company.com",
+    "password": "$2b$10$upy489ubyqLlshISeuoGoug80gzLqYOM2IQYhckMVho4W/Xl0HZKq",
+    "role": "user",
+    "name": "Regular User"
+  }
+]
