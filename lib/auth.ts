@@ -107,27 +107,35 @@ export async function authenticateUser(
   if (pool) {
     try {
       const res = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-      if (res.rows.length === 0) return null;
-      const user = res.rows[0];
-      const isValid = await bcrypt.compare(pass, user.password_hash);
-      if (!isValid) return null;
-      return {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      };
+      if (res.rows.length > 0) {
+        const user = res.rows[0];
+        const isValid = await bcrypt.compare(pass, user.password_hash);
+        if (!isValid) return null;
+        return {
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
+      }
     } catch (e) {
       console.error("PG Auth error:", e);
     }
   }
 
-  // Fallback
+  // Fallback / Demo accounts
+  const demoUsers: UserRecord[] = [
+    { userId: 'admin-1', name: 'Admin', email: 'admin@company.com', password: await bcrypt.hash('admin123', 10), role: 'admin' },
+    { userId: 'user-1', name: 'User', email: 'user@company.com', password: await bcrypt.hash('user123', 10), role: 'user' }
+  ];
+
   try {
     const filePath = path.join(process.cwd(), "data", "users.json");
-    if (!fs.existsSync(filePath)) return null;
-    const fileData = fs.readFileSync(filePath, "utf8");
-    const users: UserRecord[] = JSON.parse(fileData);
+    let users = [...demoUsers];
+    if (fs.existsSync(filePath)) {
+      const fileData = fs.readFileSync(filePath, "utf8");
+      users = [...users, ...JSON.parse(fileData)];
+    }
     const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
     if (!user || !user.password) return null;
     const isValid = await bcrypt.compare(pass, user.password);

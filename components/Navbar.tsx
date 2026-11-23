@@ -38,12 +38,15 @@ export async function Navbar() {
               >
                 Dashboard
               </Link>
-              <Link
-                href="/inventory"
-                className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-              >
-                Inventory
-              </Link>
+              {session.role === 'admin' && (
+                <Link
+                  href="/users"
+                  className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                >
+                  Users
+                </Link>
+              )}
+
 
               <div className="flex items-center gap-2.5 pl-3 border-l border-zinc-200 dark:border-zinc-800">
                 <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">

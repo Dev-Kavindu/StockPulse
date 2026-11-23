@@ -51,13 +51,16 @@ export function MobileNav({ session }: MobileNavProps) {
               >
                 Dashboard
               </Link>
-              <Link
-                href="/inventory"
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-              >
-                Inventory
-              </Link>
+              {session.role === 'admin' && (
+                <Link
+                  href="/users"
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  Users
+                </Link>
+              )}
+
               <div className="px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-between border border-zinc-200/80 dark:border-zinc-700/80">
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
